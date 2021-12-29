@@ -1,13 +1,15 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:presensikaryawan/constant/constant.dart';
-import 'package:presensikaryawan/launcher.dart';
-import 'package:presensikaryawan/model/api.dart';
-import 'package:presensikaryawan/view/home.dart';
-import 'package:presensikaryawan/view/about.dart';
+import 'package:presensiandroid/constant/constant.dart';
+import 'package:presensiandroid/launcher.dart';
+import 'package:presensiandroid/model/api.dart';
+import 'package:presensiandroid/view/home.dart';
+import 'package:presensiandroid/view/absensi.dart';
+import 'package:presensiandroid/view/history.dart';
+import 'package:presensiandroid/view/about.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:http/http.dart' as http;
+// import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -17,7 +19,7 @@ void main() {
     theme: ThemeData(primaryColor: Colors.orange[500]),
     routes: <String, WidgetBuilder>{
       SPLASH_SCREEN: (BuildContext context) => Launcher(),
-      HOME_SCREEN: (BuildContext context) => Login(),
+      HOME_SCREEN: (BuildContext context) => hal_utama(),
     },
   ));
 }
@@ -52,7 +54,7 @@ class _LoginState extends State<Login> {
       setState(() {
         _apicall = true;
       });
-      login();
+      // login();
     }
   }
 
@@ -68,32 +70,32 @@ class _LoginState extends State<Login> {
     ));
   }
 
-  login() async {
-    final response = await http.post(BaseUrl.login,
-        body: {"username": username, "password": password});
-    final data = jsonDecode(response.body);
-    int value = data['value'];
-    String pesan = data['message'];
-    String usernameAPI = data['user'];
-    String namaAPI = data['nama'];
-    String id = data['user_id'];
-    String jabatan = data['jabatan'];
-    String nik = data['nik'];
-    String foto = data['foto'];
+  // login() async {
+  //   final response = await http.post(BaseUrl.login,
+  //       body: {"username": username, "password": password});
+  //   final data = jsonDecode(response.body);
+  //   int value = data['value'];
+  //   String pesan = data['message'];
+  //   String usernameAPI = data['user'];
+  //   String namaAPI = data['nama'];
+  //   String id = data['user_id'];
+  //   String jabatan = data['jabatan'];
+  //   String nik = data['nik'];
+  //   String foto = data['foto'];
 
-    if (value == 1) {
-      setState(() {
-        _loginStatus = LoginStatus.signIn;
-        savePref(value, usernameAPI, namaAPI, id, jabatan, foto, nik);
-      });
-      _snackbar(pesan);
-    } else {
-      _snackbar(pesan);
-      setState(() {
-        _apicall = false;
-      });
-    }
-  }
+  //   if (value == 1) {
+  //     setState(() {
+  //       _loginStatus = LoginStatus.signIn;
+  //       savePref(value, usernameAPI, namaAPI, id, jabatan, foto, nik);
+  //     });
+  //     _snackbar(pesan);
+  //   } else {
+  //     _snackbar(pesan);
+  //     setState(() {
+  //       _apicall = false;
+  //     });
+  //   }
+  // }
 
   savePref(int value, String username, String nama, String id, String jabatan,
       String foto, String nik) async {
@@ -111,22 +113,22 @@ class _LoginState extends State<Login> {
 
   var value;
   getPref() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
+    // SharedPreferences preferences = await SharedPreferences.getInstance();
     setState(() {
       value = preferences.getInt("value");
       _loginStatus = value == 1 ? LoginStatus.notSignIn : LoginStatus.notSignIn;
     });
   }
 
-  signOut() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    setState(() {
-      _apicall = false;
-      preferences.setInt("value", null);
-      preferences.commit();
-      _loginStatus = LoginStatus.notSignIn;
-    });
-  }
+  // signOut() async {
+  //   SharedPreferences preferences = await SharedPreferences.getInstance();
+  //   setState(() {
+  //     _apicall = false;
+  //     preferences.setInt("value", null);
+  //     preferences.commit();
+  //     _loginStatus = LoginStatus.notSignIn;
+  //   });
+  // }
 
   @override
   void initState() {
@@ -326,154 +328,66 @@ class _LoginState extends State<Login> {
   }
 }
 
-String notifikasi;
-
-class MainMenu extends StatefulWidget {
-  final VoidCallback signOut;
-  MainMenu(this.signOut);
+class hal_utama extends StatefulWidget {
   @override
-  _MainMenuState createState() => _MainMenuState();
+  hal_utama_state createState() => hal_utama_state();
 }
 
-class _MainMenuState extends State<MainMenu> {
-  signOut() {
-    if (this.mounted) {
-      setState(() {
-        widget.signOut();
-      });
-    }
-  }
+class hal_utama_state extends State<hal_utama> {
+  int _selectedIndex = 0;
+  static const TextStyle optionStyle =
+      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+  List<Widget> _widgetOptions = <Widget>[
+    Home(),
+    Absensi(),
+    History(),
+    About(),
+  ];
 
-  String username = "", nama = "", userid = "";
-  TabController tabController;
-
-  getPref() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
+  void _onItemTapped(int index) {
     setState(() {
-      username = preferences.getString("user");
-      nama = preferences.getString("nama");
-      userid = preferences.getString("id");
+      _selectedIndex = index;
     });
   }
 
   @override
-  void initState() {
-    if (this.mounted) {
-      super.initState();
-    }
-  }
-
-  @override
-  void dispose() {
-    if (this.mounted) {
-      super.dispose();
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-        length: 2,
-        child: Scaffold(
-          appBar: AppBar(
-            title: Row(
-              children: [
-                new Image.asset(
-                  "gambar/logo-absen.png",
-                  width: 30,
-                  height: 30,
-                ),
-                SizedBox(
-                  width: 20.0,
-                ),
-                new Text(
-                  "Aplikasi Presensi",
-                  style: TextStyle(
-                      fontSize: 16.0,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            actions: <Widget>[
-              IconButton(
-                  color: Colors.white,
-                  icon: _buildIconBadge(
-                      Icons.notifications, notifikasi ?? '', Colors.red),
-                  onPressed: null),
-              IconButton(
-                onPressed: () {
-                  signOut();
-                },
-                color: Colors.white,
-                icon: Icon(Icons.exit_to_app),
-              ),
-            ],
-          ),
-          body: TabBarView(
-            children: <Widget>[
-              Home(),
-              About(),
-            ],
-          ),
-          bottomNavigationBar: TabBar(
-            labelColor: Colors.red,
-            unselectedLabelColor: Colors.amber[900],
-            indicatorColor: Colors.redAccent,
-            tabs: <Widget>[
-              Tab(
-                icon: Icon(Icons.home),
-                child: new Text(
-                  "Home",
-                  style: TextStyle(fontSize: 12.0),
-                ),
-              ),
-              Tab(
-                icon: Icon(Icons.person),
-                child: new Text(
-                  "About",
-                  style: TextStyle(fontSize: 12.0),
-                ),
-              ),
-            ],
-          ),
-        ));
-  }
-}
-
-Widget _buildIconBadge(
-  IconData icon,
-  String badgeText,
-  Color badgeColor,
-) {
-  return Stack(
-    children: <Widget>[
-      Icon(
-        icon,
-        size: 30.0,
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Aplikasi Presensi (BETA)'),
+        backgroundColor: Colors.blue,
+        // actions: [Icon(Icons.bus_alert)],
       ),
-      Positioned(
-        top: 2.0,
-        right: 4.0,
-        child: Container(
-          padding: EdgeInsets.all(1.0),
-          decoration: BoxDecoration(
-            color: badgeColor,
-            shape: BoxShape.circle,
+      body: Center(
+        child: _widgetOptions.elementAt(_selectedIndex),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+            backgroundColor: Colors.blue,
           ),
-          child: Center(
-            child: Text(
-              badgeText,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 10.0,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.book),
+            label: 'Absensi',
+            backgroundColor: Colors.blue,
           ),
-        ),
-      )
-    ],
-  );
+          BottomNavigationBarItem(
+            icon: Icon(Icons.history),
+            label: 'Riwayat Absensi',
+            backgroundColor: Colors.blue,
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'About',
+            backgroundColor: Colors.blue,
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.white,
+        onTap: _onItemTapped,
+      ),
+    );
+  }
 }

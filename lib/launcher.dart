@@ -1,6 +1,5 @@
-import 'package:presensikaryawan/constant/constant.dart';
+import 'package:presensiandroid/constant/constant.dart';
 import 'dart:async';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class Launcher extends StatefulWidget {
@@ -44,9 +43,9 @@ class _LauncherState extends State<Launcher>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.orange[500],
+      backgroundColor: Colors.white,
       body: Container(
-          decoration: BoxDecoration(color: Colors.orange[500]),
+          decoration: BoxDecoration(color: Colors.white),
           child: Stack(
             fit: StackFit.expand,
             children: <Widget>[
@@ -54,7 +53,7 @@ class _LauncherState extends State<Launcher>
                 padding: EdgeInsets.all(8.0),
               ),
               new Image.asset(
-                'gambar/logo-absen.png',
+                'images/logo.png',
                 width: animation.value * 200,
                 height: animation.value * 200,
               ),

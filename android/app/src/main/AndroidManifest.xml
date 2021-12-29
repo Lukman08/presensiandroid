@@ -1,7 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.presensikaryawan">
+package="com.example.presensiandroid">
+<uses-permission android:name="android.permission.INTERNET" />
+
+    
    <application
-        android:label="presensikaryawan"
+        android:label="presensiandroid"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
