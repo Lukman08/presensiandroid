@@ -2,14 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:presensiandroid/constant/constant.dart';
 import 'package:presensiandroid/launcher.dart';
-import 'package:presensiandroid/model/api.dart';
 import 'package:presensiandroid/view/home.dart';
 import 'package:presensiandroid/view/absensi.dart';
 import 'package:presensiandroid/view/history.dart';
 import 'package:presensiandroid/view/about.dart';
 import 'package:flutter/material.dart';
-// import 'package:http/http.dart' as http;
-// import 'package:shared_preferences/shared_preferences.dart';
+
 
 void main() {
   runApp(MaterialApp(
